@@ -3,6 +3,7 @@ module Reflex.Dom.Extra where
 
 import Control.Lens
 import Control.Monad.Fix
+import Data.Char
 import Data.Either
 import Data.Map as M
 import Data.Maybe
@@ -252,12 +253,18 @@ inputMonth
   :: (MonadFix m, DomBuilder t m, MonadHold t m)
   => InputElementConfig er t (DomBuilderSpace m)
   -> m (InputElement er (DomBuilderSpace m) t)
-inputMonth ec = inputCorrect correct $ ec
+inputMonth ec = inputCorrect correct2 $ ec
   & initialAttributes %~ (<> "type" =: "text" <> "maxlength" =: "5")
   where
-    correct ov nv = case (T.length ov, T.length nv) of
-      (x,2) | x < 2 -> nv <> "/"
-      (x,3) | x > 3 -> T.take 2 nv
-      (_, x) | x > 2 && T.head (T.drop 2 nv) /= '/' ->
-        T.take 5 $ T.take 2 nv <> "/" <> T.drop 2 nv
-      _     -> nv
+    correct2 (T.length -> ol) (T.foldl' f "" -> nv)
+      | ol < 2 && nl == 2 = nv `T.snoc` '/'
+      | ol > 3 && nl == 3 = T.init nv
+      | otherwise = nv
+      where
+        nl = T.length nv
+    f r c
+      | (lr == 2 && isDigit c) = r `T.snoc` '/' `T.snoc` c
+      | (lr == 2 && c == '/') || (isDigit c && lr < 5) = T.snoc r c
+      | otherwise = r
+      where
+        lr = T.length r

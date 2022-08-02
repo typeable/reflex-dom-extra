@@ -33,3 +33,4 @@ library
                      , OverloadedStrings
                      , RecordWildCards
                      , RecursiveDo
+                     , ViewPatterns
