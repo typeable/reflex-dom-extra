@@ -21,6 +21,7 @@ library
                      , jsaddle
                      , lens
                      , reflex-dom
+                     , semialign
                      , text
   if impl(ghcjs)
     build-depends:

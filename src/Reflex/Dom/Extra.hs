@@ -3,12 +3,15 @@ module Reflex.Dom.Extra where
 
 import Control.Lens
 import Control.Monad.Fix
+import Data.Bitraversable
 import Data.Char
 import Data.Either
 import Data.Map as M
 import Data.Maybe
 import Data.Text as T hiding (zip, map)
+import Data.Zip as Z
 import Language.Javascript.JSaddle
+import Prelude hiding (zip, unzip, zipWith)
 import Reflex.Dom
 import JavaScript.Object.Internal as JS
 
@@ -180,11 +183,13 @@ form :: DomBuilder t m => Map Text Text -> m a -> m a
 form attrs = elAttr "form" attrs
 
 -- | Join event of event into single event.
-joinE
-  :: (Reflex t, MonadHold t m)
-  => Event t (Event t a)
-  -> m (Event t a)
+joinE :: (Reflex t, MonadHold t m) => Event t (Event t a) -> m (Event t a)
 joinE = switchHold never
+
+joinEE
+  :: (Reflex t, MonadHold t m)
+  => Event t (Event t a, Event t b) -> m (Event t a, Event t b)
+joinEE = bitraverse joinE joinE . Z.unzip
 
 -- | Separate an event to two sequences based on given predicate.
 -- The first element of resulting pair keeps events for which the predicate
