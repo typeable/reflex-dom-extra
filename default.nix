@@ -1,8 +1,8 @@
 { reflex-platform ? ((import <nixpkgs> {}).fetchFromGitHub {
     owner = "reflex-frp";
     repo = "reflex-platform";
-    rev = "efc6d923c633207d18bd4d8cae3e20110a377864";
-    sha256 = "121rmnkx8nwiy96ipfyyv6vrgysv0zpr2br46y70zf4d0y1h1lz5";
+    rev = "a4664e3b99f1b89a77ac759501b6bd85e18eac95";
+    sha256 = "1pjzjhj966rs16f4b80ir9v8d7g7q2aa0i0zs30fny3x0xk1b4ah";
     })
 }:
 (import reflex-platform {}).project ({ pkgs, ... }:{

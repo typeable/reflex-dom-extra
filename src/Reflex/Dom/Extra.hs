@@ -9,6 +9,7 @@ import Data.Either
 import Data.Map as M
 import Data.Maybe
 import Data.Text as T hiding (zip, map)
+import Data.Witherable
 import Data.Zip as Z
 import Language.Javascript.JSaddle
 import Prelude hiding (zip, unzip, zipWith)
@@ -194,37 +195,27 @@ joinEE = bitraverse joinE joinE . Z.unzip
 -- | Separate an event to two sequences based on given predicate.
 -- The first element of resulting pair keeps events for which the predicate
 -- holds, the second -- those for which it doesn't.
-separateE
-  :: Reflex t
-  => (a -> Bool)
-  -> Event t a
-  -> (Event t a, Event t a)
-separateE p e = (ffilter p e, ffilter (not . p) e)
+partitionE :: Reflex t => (a -> Bool) -> Event t a -> (Event t a, Event t a)
+partitionE p e = (ffilter p e, ffilter (not . p) e)
 
 -- | Separate an event with optional payload.
--- The first event in the resulting pair keeps @Just@s, the seconds keeps
--- @Nothing@s.
-separateMaybeE
-  :: Reflex t
-  => Event t (Maybe a)
-  -> (Event t (Maybe a), Event t (Maybe a))
-separateMaybeE = separateE isJust
+-- The first event in the resulting pair keeps @Nothing@s, the seconds keeps
+-- @Just@s.
+partitionMaybeE
+  :: Reflex t => Event t (Maybe a) -> (Event t (), Event t a)
+partitionMaybeE e = (preview _Nothing <$?> e, id <$?> e)
 
 -- | Filter only events with existing payload.
-fromMaybeE
-  :: Reflex t
-  => Event t (Maybe a)
-  -> Event t a
+fromMaybeE :: Reflex t => Event t (Maybe a) -> Event t a
 fromMaybeE = fmapMaybe id
 
 -- | Separate an event with alternative payload.
 -- The first event in the resulting pair keeps @Left@s, the seconds keeps
 -- @Right@s.
-separateEitherE
+partitionEitherE
   :: Reflex t
-  => Event t (Either a b)
-  -> (Event t (Either a b), Event t (Either a b))
-separateEitherE = separateE isLeft
+  => Event t (Either a b) -> (Event t a, Event t b)
+partitionEitherE e = (preview _Left <$?> e, preview _Right <$?> e)
 
 -- | Assigns HTML content to an element, allows embedding of arbitrary
 -- HTML tags, so make sure you trust the source of the second argument
