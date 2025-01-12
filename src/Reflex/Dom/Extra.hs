@@ -10,10 +10,10 @@ import Data.Map as M
 import Data.Maybe
 import Data.Text as T hiding (zip, map)
 import Data.Zip as Z
-import Language.Javascript.JSaddle
+-- import Language.Javascript.JSaddle
 import Prelude hiding (zip, unzip, zipWith)
 import Reflex.Dom
-import JavaScript.Object.Internal as JS
+-- import JavaScript.Object.Internal as JS
 
 -- | @<meta>@ element.
 meta :: DomBuilder t m => Map Text Text -> m ()
@@ -226,6 +226,7 @@ separateEitherE
   -> (Event t (Either a b), Event t (Either a b))
 separateEitherE = separateE isLeft
 
+{-
 -- | Assigns HTML content to an element, allows embedding of arbitrary
 -- HTML tags, so make sure you trust the source of the second argument
 -- @
@@ -237,6 +238,7 @@ unsafeInnerHTML rel html = liftJSM $ do
   htmlVal <- toJSVal html
   relVal <- toJSVal rel
   JS.setProp "innerHTML" htmlVal (JS.Object relVal)
+-}
 
 -- | input element which is changes while edited.
 -- It is useful to input dates, phones etc
